@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Counselor Schedule</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="eDisiplinStyle.css">
+        <script src="data.js"></script>
+
+    </head>
+    <body>
+        <div class="navbar">
+            <span class="navbar-brand">Counselor Puan Farah welcome to E-Disiplin</span>
+        </div>
+        
+        <div class="container-main">
+            <div class="sidebar">
+                <ul>
+                    <li><a href="counselorDashboard.html">Home</a></li>
+                    <li><a href="counselorSchedule.html" class="active">Schedule</a></li>
+                    <li><a href="counselorRecord.html">Records</a></li>
+                    <li><a href="index.html">Logout</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <div class="dashboard-header">
+                    <h2>Counseling Schedule & Status</h2>
+                </div>
+
+                <div class="schedule-container">
+                    <!-- Calendar Section -->
+                    <div class="calendar-section">
+                        <div class="calendar">
+                            <div class="calendar-header">
+                                <button onclick="previousMonth()" class="nav-btn">&lt;</button>
+                                <div class="cal-header-center">
+                                    <label for="monthSelect" class="cal-label">Month:</label>
+                                    <select id="monthSelect" onchange="onMonthChange()" class="cal-select">
+                                        <option value="0">January</option>
+                                        <option value="1">February</option>
+                                        <option value="2">March</option>
+                                        <option value="3">April</option>
+                                        <option value="4">May</option>
+                                        <option value="5" selected>June</option>
+                                        <option value="6">July</option>
+                                        <option value="7">August</option>
+                                        <option value="8">September</option>
+                                        <option value="9">October</option>
+                                        <option value="10">November</option>
+                                        <option value="11">December</option>
+                                    </select>
+                                    <label for="yearSelect" class="cal-label-offset">Year:</label>
+                                    <select id="yearSelect" onchange="onYearChange()" class="cal-select">
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026" selected>2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                    </select>
+                                </div>
+                                <button onclick="nextMonth()" class="nav-btn">&gt;</button>
+                            </div>
+                            <div class="calendar-grid" id="calendarGrid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-section">
+                        <div class="status-cards">
+                            <div class="status-card">
+                                <h4>[COMPLETED]</h4>
+                                <ul class="status-list" id="completedList">
+                                </ul>
+                            </div>
+
+                            <div class="status-card">
+                                <h4>PENDING (Waiting to Done)</h4>
+                                <ul class="status-list" id="pendingList">
+                                </ul>
+                            </div>
+
+                            <div class="status-card">
+                                <h4>NOT SET DATE YET</h4>
+                                <ul class="status-list" id="notSetList">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="caseDetailsModal">
+            <div class="modal-card schedule-modal-card">
+                <div class="modal-header">
+                    <h3 id="caseModalTitle">Cases for Date</h3>
+                    <button type="button" class="close-modal" onclick="closeCaseModal()">&times;</button>
+                </div>
+                <div id="caseDetailsContainer">
+                </div>
+            </div>
+        </div>
+
+        <div class="notification" id="scheduleNotification"></div>
+
+        <script>
+            let currentYear = 2026;
+            let currentMonth = 5; 
+            let datesCases = {};
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const loggedInCounselor = "Pn. Farah";
+
+                const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+
+                generateCalendar(myCases);
+
+                populateStatusSections(myCases);
+            });
+
+            function generateCalendar(cases) {
+                const calendarGrid = document.getElementById("calendarGrid");
+
+                calendarGrid.innerHTML = '';
+
+                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'day-header';
+                    header.textContent = day;
+                    calendarGrid.appendChild(header);
+                });
+
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day other-month';
+                    day.textContent = daysInPrevMonth - i;
+                    calendarGrid.appendChild(day);
+                }
+
+                for (let date = 1; date <= daysInMonth; date++) {
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day';
+
+                    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                    const casesOnDate = cases.filter(c => c.appointmentDate === dateStr);
+                    const hasAppointment = casesOnDate.length > 0;
+
+                    if (hasAppointment) {
+                        day.className += ' has-appointment';
+                        datesCases[dateStr] = casesOnDate;
+                    }
+
+                    const dayNum = document.createElement('div');
+                    dayNum.className = 'calendar-day-number';
+                    dayNum.textContent = date;
+                    day.appendChild(dayNum);
+
+                    if (hasAppointment) {
+                        const caseNames = casesOnDate.map(c => c.name).join(', ');
+                        day.title = caseNames;
+                        day.style.cursor = 'pointer';
+                        
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'calendar-day-tooltip';
+                        tooltip.textContent = casesOnDate.length > 1 ? `${casesOnDate.length} cases` : casesOnDate[0].name;
+                        day.appendChild(tooltip);
+
+                        day.addEventListener('click', () => showCaseModal(dateStr));
+                    }
+
+                    calendarGrid.appendChild(day);
+                }
+
+                const totalCells = calendarGrid.children.length - 7;
+                const remainingCells = 42 - totalCells;
+                for (let date = 1; date <= remainingCells; date++) {
+                    const day = document.createElement('div');
+                    day.className = 'calendar-day other-month';
+                    day.textContent = date;
+                    calendarGrid.appendChild(day);
+                }
+            }
+
+            function previousMonth() {
+                if (currentMonth === 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                } else {
+                    currentMonth--;
+                }
+                
+                document.getElementById("monthSelect").value = currentMonth;
+                document.getElementById("yearSelect").value = currentYear;
+                
+                const loggedInCounselor = "Pn. Farah";
+                const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                generateCalendar(myCases);
+            }
+
+            function nextMonth() {
+                if (currentMonth === 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                } else {
+                    currentMonth++;
+                }
+                
+                document.getElementById("monthSelect").value = currentMonth;
+                document.getElementById("yearSelect").value = currentYear;
+                
+                const loggedInCounselor = "Pn. Farah";
+                const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                generateCalendar(myCases);
+            }
+
+            function onMonthChange() {
+                currentMonth = parseInt(document.getElementById("monthSelect").value);
+                
+                const loggedInCounselor = "Pn. Farah";
+                const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                generateCalendar(myCases);
+            }
+
+            function onYearChange() {
+                currentYear = parseInt(document.getElementById("yearSelect").value);
+                
+                const loggedInCounselor = "Pn. Farah";
+                const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                generateCalendar(myCases);
+            }
+
+            function showCaseModal(dateStr) {
+                const cases = datesCases[dateStr] || [];
+                const modal = document.getElementById("caseDetailsModal");
+                const title = document.getElementById("caseModalTitle");
+                const container = document.getElementById("caseDetailsContainer");
+
+                const dateObj = new Date(dateStr + 'T00:00:00');
+                const dateDisplay = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                title.textContent = `Cases for ${dateDisplay}`;
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const appointmentDate = new Date(dateStr + 'T00:00:00');
+                const canComplete = appointmentDate <= today;
+
+                container.innerHTML = '';
+                cases.forEach(caseItem => {
+                    const caseDiv = document.createElement('div');
+                    caseDiv.style.marginBottom = '20px';
+                    caseDiv.style.padding = '15px';
+                    caseDiv.style.backgroundColor = '#f5f5f5';
+                    caseDiv.style.borderRadius = '4px';
+                    caseDiv.innerHTML = `
+                        <p><strong>Student:</strong> ${caseItem.name}</p>
+                        <p><strong>ID:</strong> ${caseItem.id}</p>
+                        <p><strong>Offense:</strong> ${caseItem.offense}</p>
+                        <p><strong>Description:</strong> ${caseItem.desc}</p>
+                        <p><strong>Status:</strong> <span class="status-badge ${caseItem.status === 'Completed' ? 'status-completed' : 'status-pending'}">${caseItem.status}</span></p>
+                        ${caseItem.status === 'Pending' || caseItem.status === 'Not Set'
+                            ? canComplete
+                                ? `<button onclick="markAsCompleted('${caseItem.id}','${dateStr}')" class="btn-complete">✓ Mark as Completed</button>`
+                                : `<p class="complete-disabled">Appointment date hasn't arrived yet. Cannot mark as completed.</p>`
+                            : ''}
+                    `;
+                    container.appendChild(caseDiv);
+                });
+
+                modal.classList.add('show');
+            }
+
+            function closeCaseModal() {
+                document.getElementById("caseDetailsModal").classList.remove('show');
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById("caseDetailsModal");
+                if (event.target == modal) {
+                    modal.classList.remove('show');
+                }
+            }
+
+            function setAppointmentDate(studentId) {
+                const input = document.getElementById(`dateInput-${studentId}`);
+                const date = input.value;
+                if (!date) {
+                    alert("Please select a date first.");
+                    return;
+                }
+
+                const caseItem = incidents.find(c => c.id === studentId);
+                if (caseItem) {
+                    caseItem.appointmentDate = date;
+                    if (caseItem.status === "Not Set" || caseItem.status === "Pending") {
+                        caseItem.status = "Pending";
+                    }
+
+                    const loggedInCounselor = "Pn. Farah";
+                    const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                    generateCalendar(myCases);
+                    populateStatusSections(myCases);
+                }
+            }
+
+            function populateStatusSections(cases) {
+                const completedList = document.getElementById("completedList");
+                const pendingList = document.getElementById("pendingList");
+                const notSetList = document.getElementById("notSetList");
+
+                completedList.innerHTML = '';
+                pendingList.innerHTML = '';
+                notSetList.innerHTML = '';
+
+                const completed = cases.filter(c => c.status === "Completed");
+                const pending = cases.filter(c => c.status === "Pending");
+                const notSet = cases.filter(c => c.status === "Not Set");
+
+                if (completed.length === 0) {
+                    completedList.innerHTML = '<li class="empty-message">No completed cases yet.</li>';
+                } else {
+                    const sorted = [...completed].sort((a, b) => (b.appointmentDate || '').localeCompare(a.appointmentDate || ''));
+                    const latest = sorted.slice(0, 3);
+                    latest.forEach(c => {
+                        const li = document.createElement('li');
+                        li.className = 'student-item';
+                        li.innerHTML = `<strong>${c.name}</strong><br><span class="student-item-id">${c.id} — ${c.appointmentDate || 'N/A'}</span>`;
+                        completedList.appendChild(li);
+                    });
+                    if (completed.length > 3) {
+                        const li = document.createElement('li');
+                        li.style.textAlign = 'center';
+                        li.style.padding = '10px 0 0';
+                        li.style.borderBottom = 'none';
+                        li.innerHTML = `<a href="counselorRecord.html?status=Completed" class="view-link small">View all completed records →</a>`;
+                        completedList.appendChild(li);
+                    }
+                }
+
+                if (pending.length === 0) {
+                    pendingList.innerHTML = '<li class="empty-message">No pending cases.</li>';
+                } else {
+                    pending.forEach(c => {
+                        const li = document.createElement('li');
+                        li.className = 'student-item';
+                        li.innerHTML = `<strong>${c.name}</strong><br><span class="student-item-id">${c.id} — ${c.appointmentDate || 'Not Set'}</span>`;
+                        pendingList.appendChild(li);
+                    });
+                }
+
+                if (notSet.length === 0) {
+                    notSetList.innerHTML = '<li class="empty-message">All cases have dates set.</li>';
+                } else {
+                    notSet.forEach(c => {
+                        const li = document.createElement('li');
+                        li.className = 'student-item';
+                        li.style.borderBottom = '1px solid #f0f0f0';
+                        li.style.padding = '10px 0';
+                        li.innerHTML = `
+                            <strong>${c.name}</strong><br>
+                            <span class="student-item-id">${c.id} — ${c.offense}</span>
+                            <div class="date-row">
+                                <input type="date" id="dateInput-${c.id}" class="date-picker" min="${new Date().toISOString().split('T')[0]}">
+                                <button onclick="setAppointmentDate('${c.id}')" class="set-date-btn">Set Date</button>
+                            </div>
+                        `;
+                        notSetList.appendChild(li);
+                    });
+                }
+            }
+
+            function showToast(msg) {
+                const notif = document.getElementById('scheduleNotification');
+                notif.textContent = msg;
+                notif.classList.add('show');
+                setTimeout(() => notif.classList.remove('show'), 2500);
+            }
+
+            function markAsCompleted(studentId, dateStr) {
+                const caseItem = incidents.find(c => c.id === studentId);
+                if (caseItem) {
+                    caseItem.status = "Completed";
+                    showToast(`✓ ${caseItem.name}'s session marked as completed!`);
+
+                    const loggedInCounselor = "Pn. Farah";
+                    const myCases = incidents.filter(item => item.assignedCounselor === loggedInCounselor);
+                    generateCalendar(myCases);
+                    populateStatusSections(myCases);
+                    closeCaseModal();
+                }
+            }
+        </script>
+    </body>
+</html>

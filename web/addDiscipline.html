@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Add Discipline</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="eDisiplinStyle.css">
+    </head>
+    <body>
+        <div class="navbar">
+            <span class="navbar-brand">HEP welcome to E-Disiplin</span>
+        </div>
+
+        <div class="container-main">
+
+            <div class="sidebar">
+                <ul>
+                    <li><a href="hepDashboard.html">Home</a></li>
+                    <li><a href="addDiscipline.html" class="active">Log Discipline</a></li>
+                    <li><a href="recordEDisiplin.html">Records</a></li>
+                    <li><a href="index.html">Logout</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <div class="dashboard-header">
+                    <h2>Log Discipline</h2>
+                </div>
+
+                <div class="notification" id="successNotification">
+                    ✓ Log successful! Record saved successfully.
+                </div>
+
+                <div class="form-card">
+                    <form id="disciplineForm">
+                        <div class="form-group">
+                            <label>Student ID</label>
+                            <input type="text" name="studentID" placeholder="Enter student ID">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Student Name</label>
+                            <input type="text" name="studentName" placeholder="Enter student name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Offense Type</label>
+                            <select name="offenseType" required>
+                                <option value="">-- Select offense type --</option>
+                                <option value="Smoking">Smoking</option>
+                                <option value="Bullying">Bullying</option>
+                                <option value="Fighting">Fighting</option>
+                                <option value="Cheating">Cheating in Exam</option>
+                                <option value="Vandalism">Vandalism</option>
+                                <option value="LateAttendance">Late Attendance</option>
+                                <option value="DressCode">Dress Code Violation</option>
+                                <option value="Plagiarism">Plagiarism</option>
+                                <option value="HostelMisconduct">Hostel Misconduct</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="disciplineDesc" placeholder="Enter description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date of Incident</label>
+                            <input type="date" name="disciplineDate">
+                        </div>
+
+                        <div class="counselor-box">
+                            <label>Assign Counselor</label>
+                            <select name="assignedCounselor" id="assignedCounselor">
+                                <option value="">-- Select counselor --</option>
+                                <option value="Pn. Farah">Pn. Farah</option>
+                                <option value="En. Amir">En. Amir</option>
+                                <option value="Pn. Aina">Pn. Aina</option>
+                                <option value="En. Hafiz">En. Hafiz</option>
+                            </select>
+                            <button type="button" id="assignCounselorButton" class="btn-assign">Assign Counselor</button>
+                            <p id="assignedCounselorPreview" class="counselor-preview">No counselor assigned yet.</p>
+                        </div>
+
+                        <button type="submit" id="addIncidentButton" class="btn-submit">Add Log Incident</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const counselorSelect = document.getElementById('assignedCounselor');
+            const counselorPreview = document.getElementById('assignedCounselorPreview');
+            document.getElementById('assignCounselorButton').addEventListener('click', function () {
+                counselorPreview.textContent = counselorSelect.value
+                    ? `Counselor assigned: ${counselorSelect.value}`
+                    : 'No counselor assigned yet.';
+            });
+
+            document.getElementById('disciplineForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const notification = document.getElementById('successNotification');
+                const form = event.currentTarget;
+
+                notification.classList.remove('hide');
+                notification.classList.add('show');
+
+                form.reset();
+                counselorPreview.textContent = 'No counselor assigned yet.';
+
+                setTimeout(() => {
+                    notification.classList.add('hide');
+                    setTimeout(() => {
+                        notification.classList.remove('show', 'hide');
+                    }, 300);
+                }, 2500);
+            });
+        </script>
+    </body>
+</html>

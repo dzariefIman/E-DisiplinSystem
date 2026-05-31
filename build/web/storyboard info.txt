@@ -1,0 +1,46 @@
+GROUP CS2664A 
+Project Title: E-Disiplin: Student Conduct & Counseling Log
+
+Team members:
+2025248228      MOHAMMED DZARIEF IMAN BIN MOHAMMED DZULHARDY
+
+2025428118	NUR RAUDHATUL IMANE BINTI MOHD RASHID
+
+2025421242	SERI NUR SYAZWA BINTI ARIANDI AHMAD
+
+2025245048	SHAZWANA HUSNA BINTI SAARI
+
+Users type and their role:
+- The system will have two users, which are HEP and Counselor.
+- Hep role is to log new disciplinary incident and assign them to the counselor.
+- Counselors role is to manage appointment schedules and session completion status.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+CRUD
+
+CREATE -
+- HEP can log or add new discipline incident, they need to provide students info, discipline offense details and assign to counselor.
+- Counselor can set appointment date for cases with no date
+
+READ -
+- HEP can also read the data in dashboard page, where they can see total cases, 
+  common offenses, pending cases and also charts of offense and success rate
+- HEP can read the recorded discipline in page record E-Disiplin page, this will show all the data of recorded disciplinary incident.
+- Counselor can read stats in dashboard page, like total, complete and pending cases they handle. also pie chart an latest cases.
+- Counselor can see table of records of the cases that they handle.
+
+UPDATE -
+- HEP can update or edit the recorded data of disciplinary incident, for example students info, incident info or assign to other counselor.
+- counselor can change status of case, for example when they set date it also change status to pending, 
+  and also can change status to complete after the date of appointment.
+
+DELETE -
+- HEP can delete the recorded data by clicking the delete button in record E-Disiplin page.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+Trends - 
+- Hep dashboard is to view total disciplinary cases, most common offenses, pending counseling sessions 
+  and also pie charts of cases by Offense Type and line chart of counseling Session Success Rate.
+- Counselor dashboard is to view total, completed and pending cases that theyve been assigned for. and also completion rate by percentage 
+  and pie chart of case by status.
+

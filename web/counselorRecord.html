@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Counselor Records</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="eDisiplinStyle.css">
+        <script src="data.js"></script>
+    </head>
+    <body>
+        <div class="navbar">
+            <span class="navbar-brand">Counselor Puan Farah welcome to E-Disiplin</span>
+        </div>
+
+        <div class="container-main">
+            <div class="sidebar">
+                <ul>
+                    <li><a href="counselorDashboard.html">Home</a></li>
+                    <li><a href="counselorSchedule.html">Schedule</a></li>
+                    <li><a href="counselorRecord.html" class="active">Records</a></li>
+                    <li><a href="index.html">Logout</a></li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <div class="dashboard-header">
+                    <h2>My Counseling Records</h2>
+                    <p>All cases assigned to you.</p>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" placeholder="Search by name or ID..." oninput="filterRecords()" class="filter-input">
+                    <select id="filterOffense" onchange="filterRecords()" class="filter-select">
+                        <option value="">All Offenses</option>
+                        <option value="Smoking">Smoking</option>
+                        <option value="Cheating">Cheating</option>
+                        <option value="Bullying">Bullying</option>
+                        <option value="Fighting">Fighting</option>
+                        <option value="Vandalism">Vandalism</option>
+                        <option value="Late Attendance">Late Attendance</option>
+                        <option value="Disrespect">Disrespect to Staff</option>
+                        <option value="Skipping">Skipping Classes</option>
+                    </select>
+                    <select id="filterStatus" onchange="filterRecords()" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Not Set">Not Set</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="records-table" id="counselorRecordsTable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Offense Type</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Counseling Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                const tbody = document.querySelector('#counselorRecordsTable tbody');
+                const loggedInCounselor = "Pn. Farah";
+                let filteredData = null;
+
+                function getData() {
+                    return filteredData || incidents.filter(i => i.assignedCounselor === loggedInCounselor);
+                }
+
+                function renderRows() {
+                    const data = getData();
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr class="empty-table"><td colspan="7">No matching records found.</td></tr>';
+                        return;
+                    }
+                    data.forEach(item => {
+                        let statusClass = 'status-pending';
+                        if (item.status === 'Completed') statusClass = 'status-completed';
+                        else if (item.status === 'Not Set') statusClass = 'status-notset';
+
+                        const counselingDate = item.appointmentDate || 'Not Set';
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.name}</td>
+                            <td>${item.offense}</td>
+                            <td>${item.date}</td>
+                            <td>${item.desc}</td>
+                            <td>${counselingDate}</td>
+                            <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                window.filterRecords = function () {
+                    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+                    const offense = document.getElementById('filterOffense').value;
+                    const status = document.getElementById('filterStatus').value;
+
+                    const myCases = incidents.filter(i => i.assignedCounselor === loggedInCounselor);
+                    filteredData = myCases.filter(item => {
+                        const matchSearch = !search || item.name.toLowerCase().includes(search) || item.id.toLowerCase().includes(search);
+                        const matchOffense = !offense || item.offense === offense;
+                        const matchStatus = !status || item.status === status;
+                        return matchSearch && matchOffense && matchStatus;
+                    });
+                    renderRows();
+                };
+
+                const params = new URLSearchParams(window.location.search);
+                const statusParam = params.get('status');
+                if (statusParam) {
+                    document.getElementById('filterStatus').value = statusParam;
+                    filterRecords();
+                } else {
+                    renderRows();
+                }
+            })();
+        </script>
+    </body>
+</html>
