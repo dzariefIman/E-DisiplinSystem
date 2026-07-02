@@ -1,34 +1,35 @@
 # E-Disiplin
 
-School disciplinary record management system built with Java EE 7.
+Student Conduct & Counseling Log: A centralized ledger for tracking disciplinary records and scheduling mandatory counseling sessions.
 
-## Stack
+GROUP CS2664A 
+Project Title: E-Disiplin: Student Conduct & Counseling Log
 
-- Java 1.8 / Jakarta EE
-- GlassFish 4.1.1
-- Apache Derby (Java DB)
-- JSP + JSTL + EL
-- JDBC (active record pattern — DAO embedded in model classes)
+Team members:/
+  2025248228      MOHAMMED DZARIEF IMAN BIN MOHAMMED DZULHARDY
+  2025428118	NUR RAUDHATUL IMANE BINTI MOHD RASHID
+  2025421242	SERI NUR SYAZWA BINTI ARIANDI AHMAD
+  2025245048	SHAZWANA HUSNA BINTI SAARI
 
-## Project Structure
+Users type and their role/
+  - The system will have two users, which are HEP and Counselor.
+  - Hep role is to log new disciplinary incident and assign them to the counselor.
+  - Counselors role is to manage appointment schedules and session completion status.
 
-```
-src/java/
-  model/          — User.java, Incident.java (CRUD + business logic)
-  servlet/        — 9 servlets (auth, HEP, counselor flows)
-  util/           — DatabaseUtil.java (connection helper)
+---------------------------------------------------------------------------------------------------------------------------------------------
+Trends/
+  - Hep dashboard is to view total disciplinary cases, most common offenses, pending counseling sessions 
+  and also pie charts of cases by Offense Type and line chart of counseling Session Success Rate.
+  - Counselor dashboard is to view total, completed and pending cases that theyve been assigned for. and also completion rate by percentage 
+  and pie chart of case by status.
 
-web/
-  homeAndAuth/    — index, login, register
-  hepJsp/         — HEP dashboard, add discipline, records
-  counselorJsp/   — counselor dashboard, schedule, records
-  StoryboardFiles/— original HTML mockups (kept for reference)
-  WEB-INF/        — web.xml (servlet mappings)
-```
+## user name login
 
-## Setup
+HEP/
+  ID: H001
+  Password: pass123
 
-1. Create Derby database `E-Disiplin` (user: `app`, password: `app`)
-2. Run `setup/create-database.sql` to create tables and seed data
-3. Deploy to GlassFish 4.1.1
-4. Access at `http://localhost:8080/E-Disiplin/`
+Counselor/
+  ID: COO1
+  Password: pass123
+
