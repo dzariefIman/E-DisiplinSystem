@@ -1,14 +1,11 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>E-Disiplin - Student Conduct & Counseling Log</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <base href="${pageContext.request.contextPath}/">
         <link rel="stylesheet" href="eDisiplinStyle.css">
     </head>
     <body>
@@ -24,19 +21,15 @@ and open the template in the editor.
                 <h2>WELCOME TO<br>E-DISIPLIN</h2>
                 <h3>Student Conduct & Counseling Log</h3>
                 <p>A centralized ledger for tracking disciplinary records and scheduling mandatory counseling sessions.</p>
-
-                <p class="auth-text">Please <a href="login.html" class="link">login</a> to access, or <a href="register.html" class="link">register</a> for new user.</p>
-
+                <p class="auth-text">Please <a href="login" class="link">login</a> to access, or <a href="register" class="link">register</a> for new user.</p>
                 <div class="button-group">
-                    <a href="login.html" class="btn btn-primary">Login</a>
-                    <a href="register.html" class="btn btn-secondary">Register</a>
+                    <a href="login" class="btn btn-primary">Login</a>
+                    <a href="register" class="btn btn-secondary">Register</a>
                 </div>
             </div>
-
             <div class="welcome-illustration">
                 <img src="https://cdn-icons-png.flaticon.com/512/17081/17081229.png" alt="E-Disiplin Illustration" class="illustration-image">
             </div>
         </div>
     </body>
 </html>
-

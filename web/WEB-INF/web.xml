@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <display-name>E-Disiplin</display-name>
+    <welcome-file-list>
+        <welcome-file>homeAndAuth/index.jsp</welcome-file>
+    </welcome-file-list>
+    <!-- Auth -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>servlet.LoginServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>servlet.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>servlet.LogoutServlet</servlet-class>
+    </servlet>
+    <!-- HEP -->
+    <servlet>
+        <servlet-name>HEPDashboardServlet</servlet-name>
+        <servlet-class>servlet.HEPDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AddDisciplineServlet</servlet-name>
+        <servlet-class>servlet.AddDisciplineServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RecordServlet</servlet-name>
+        <servlet-class>servlet.RecordServlet</servlet-class>
+    </servlet>
+    <!-- Counselor -->
+    <servlet>
+        <servlet-name>CounselorDashboardServlet</servlet-name>
+        <servlet-class>servlet.CounselorDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CounselorScheduleServlet</servlet-name>
+        <servlet-class>servlet.CounselorScheduleServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CounselorRecordServlet</servlet-name>
+        <servlet-class>servlet.CounselorRecordServlet</servlet-class>
+    </servlet>
+    <!-- Mappings -->
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HEPDashboardServlet</servlet-name>
+        <url-pattern>/hep/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddDisciplineServlet</servlet-name>
+        <url-pattern>/hep/add-discipline</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RecordServlet</servlet-name>
+        <url-pattern>/hep/records</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CounselorDashboardServlet</servlet-name>
+        <url-pattern>/counselor/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CounselorScheduleServlet</servlet-name>
+        <url-pattern>/counselor/schedule</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CounselorRecordServlet</servlet-name>
+        <url-pattern>/counselor/records</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+</web-app>

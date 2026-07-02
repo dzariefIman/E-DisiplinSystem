@@ -1,14 +1,11 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>E-Disiplin Login</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <base href="${pageContext.request.contextPath}/">
         <link rel="stylesheet" href="eDisiplinStyle.css">
     </head>
     <body>
@@ -25,48 +22,36 @@ and open the template in the editor.
                 <h2>Login</h2>
                 <p>Select your user type and enter your credentials.</p>
 
-                <form onsubmit="handleLogin(event)">
+                <% if (request.getAttribute("error") != null) { %>
+                    <p style="color:#e74c3c;margin-bottom:16px;"><%= request.getAttribute("error") %></p>
+                <% } %>
+                <% if (request.getParameter("registered") != null) { %>
+                    <p style="color:#2ecc71;margin-bottom:16px;">Registration successful! Please login.</p>
+                <% } %>
+
+                <form action="login" method="POST">
                     <div class="form-group">
                         <label>User Type</label>
                         <div class="radio-group">
-                            <label><input type="radio" name="user_type" value="HEP"> HEP</label>
-                            <label><input type="radio" name="user_type" value="counselor"> Counselor</label>
+                            <label><input type="radio" name="userType" value="HEP" required> HEP</label>
+                            <label><input type="radio" name="userType" value="Counselor"> Counselor</label>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="staffId">Staff ID</label>
                         <input type="text" id="staffId" name="staffId" placeholder="Enter your staff ID" required>
                     </div>
-
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" placeholder="Enter your password" required>
                     </div>
-
                     <button type="submit" class="btn btn-primary btn-block">Login</button>
                 </form>
 
                 <p class="auth-link">
-                    Don't have an account? <a href="register.html" class="link">Register here</a>
+                    Don't have an account? <a href="register" class="link">Register here</a>
                 </p>
             </div>
         </div>
-
-        <script>
-            function handleLogin(event) {
-                event.preventDefault();
-                const userType = document.querySelector('input[name="user_type"]:checked');
-                if (!userType) {
-                    alert('Please select a user type (HEP or Counselor)');
-                    return;
-                }
-                if (userType.value === 'HEP') {
-                    window.location.href = 'hepDashboard.html';
-                } else if (userType.value === 'counselor') {
-                    window.location.href = 'counselorDashboard.html';
-                }
-            }
-        </script>
     </body>
 </html>
