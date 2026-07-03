@@ -67,7 +67,7 @@
                     <div class="status-section">
                         <div class="status-cards">
                             <div class="status-card">
-                                <h4>[COMPLETED]</h4>
+                                <h4>COMPLETED</h4>
                                 <ul class="status-list" id="completedList"></ul>
                             </div>
                             <div class="status-card">
@@ -125,7 +125,11 @@
                 const day = document.createElement('div'); day.className = 'calendar-day';
                 const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2,'0') + '-' + String(date).padStart(2,'0');
                 const casesOnDate = cases.filter(c => c.appointmentDate === dateStr);
-                if (casesOnDate.length > 0) { day.className += ' has-appointment'; datesCases[dateStr] = casesOnDate; }
+                if (casesOnDate.length > 0) {
+                    datesCases[dateStr] = casesOnDate;
+                    const hasPending = casesOnDate.some(c => c.status === 'Pending' || c.status === 'Not Set');
+                    day.className += hasPending ? ' has-pending' : ' has-completed';
+                }
                 const num = document.createElement('div'); num.className = 'calendar-day-number'; num.textContent = date; day.appendChild(num);
                 if (casesOnDate.length > 0) {
                     const tip = document.createElement('div'); tip.className = 'calendar-day-tooltip';
@@ -166,12 +170,15 @@
                 const div = document.createElement('div'); div.style.cssText = 'margin-bottom:20px;padding:15px;background:#f5f5f5;border-radius:4px;';
                 const stCls = c.status === 'Completed' ? 'status-completed' : (c.status === 'Not Set' ? 'status-notset' : 'status-pending');
                 div.innerHTML = '<p><strong>Student:</strong> ' + c.studentName + '</p><p><strong>ID:</strong> ' + c.studentId + '</p><p><strong>Offense:</strong> ' + c.offenseType + '</p><p><strong>Description:</strong> ' + (c.description || '') + '</p><p><strong>Status:</strong> <span class="status-badge ' + stCls + '">' + c.status + '</span></p>';
-                if (c.status === 'Pending' || c.status === 'Not Set') {
+                if (c.status === 'Pending') {
+                    div.innerHTML += '<div style="margin-top:10px;"><input type="date" id="modalDateInput-' + c.sessionId + '" class="date-picker" value="' + (c.appointmentDate || '') + '" min="' + new Date().toISOString().split('T')[0] + '"> <button onclick="updateAppointmentDate(\'' + c.sessionId + '\')" class="set-date-btn">Update Date</button></div>';
                     if (canComplete) {
                         div.innerHTML += '<form action="counselor/schedule" method="POST" style="margin-top:10px;"><input type="hidden" name="action" value="markComplete"><input type="hidden" name="sessionId" value="' + c.sessionId + '"><button type="submit" class="btn-complete">✓ Mark as Completed</button></form>';
                     } else {
-                        div.innerHTML += '<p class="complete-disabled">Appointment date hasn\'t arrived yet.</p>';
+                        div.innerHTML += '<p class="complete-disabled" style="margin-top:10px;">Appointment date hasn\'t arrived yet.</p>';
                     }
+                } else if (c.status === 'Completed') {
+                    div.innerHTML += '<form action="counselor/schedule" method="POST" style="margin-top:10px;"><input type="hidden" name="action" value="reopen"><input type="hidden" name="sessionId" value="' + c.sessionId + '"><button type="submit" class="set-date-btn" onclick="return confirm(\'Reopen this case?\')">Reopen</button></form>';
                 }
                 container.appendChild(div);
             });
@@ -197,6 +204,9 @@
                 sorted.slice(0,3).forEach(c => {
                     const li = document.createElement('li'); li.className = 'student-item';
                     li.innerHTML = '<strong>' + c.studentName + '</strong><br><span class="student-item-id">' + c.studentId + ' — ' + c.appointmentDateDisplay + '</span>';
+                    const btnRow = document.createElement('div'); btnRow.className = 'date-row';
+                    btnRow.innerHTML = '<button onclick="reopenCase(\'' + c.sessionId + '\')" class="set-date-btn">Reopen</button>';
+                    li.appendChild(btnRow);
                     completedList.appendChild(li);
                 });
                 if (completed.length > 3) {
@@ -211,6 +221,18 @@
                 pending.forEach(c => {
                     const li = document.createElement('li'); li.className = 'student-item';
                     li.innerHTML = '<strong>' + c.studentName + '</strong><br><span class="student-item-id">' + c.studentId + ' — ' + c.appointmentDateDisplay + '</span>';
+                    const row = document.createElement('div'); row.className = 'date-row';
+                    row.innerHTML = '<input type="date" id="dateInput-' + c.sessionId + '" class="date-picker" value="' + (c.appointmentDate || '') + '" min="' + new Date().toISOString().split('T')[0] + '"><button onclick="updateAppointmentDate(\'' + c.sessionId + '\')" class="set-date-btn">Update Date</button>';
+                    li.appendChild(row);
+                    const btnRow = document.createElement('div'); btnRow.style.cssText = 'margin-top:6px;';
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const aptDate = new Date(c.appointmentDate + 'T00:00:00');
+                    if (aptDate <= today) {
+                        btnRow.innerHTML = '<form action="counselor/schedule" method="POST" style="display:inline;"><input type="hidden" name="action" value="markComplete"><input type="hidden" name="sessionId" value="' + c.sessionId + '"><button type="submit" class="set-date-btn">✓ Mark Completed</button></form>';
+                    } else {
+                        btnRow.innerHTML = '<span class="complete-disabled">Appointment date hasn\'t arrived yet.</span>';
+                    }
+                    li.appendChild(btnRow);
                     pendingList.appendChild(li);
                 });
             }
@@ -235,6 +257,22 @@
             if (!date) { alert("Please select a date first."); return; }
             const form = document.createElement('form'); form.method = 'POST'; form.action = 'counselor/schedule';
             form.innerHTML = '<input type="hidden" name="action" value="setAppointment"><input type="hidden" name="sessionId" value="' + sessionId + '"><input type="hidden" name="appointmentDate" value="' + date + '">';
+            document.body.appendChild(form); form.submit();
+        }
+
+        function updateAppointmentDate(sessionId) {
+            var input = document.getElementById('dateInput-' + sessionId) || document.getElementById('modalDateInput-' + sessionId);
+            var date = input.value;
+            if (!date) { alert("Please select a date first."); return; }
+            var form = document.createElement('form'); form.method = 'POST'; form.action = 'counselor/schedule';
+            form.innerHTML = '<input type="hidden" name="action" value="updateDate"><input type="hidden" name="sessionId" value="' + sessionId + '"><input type="hidden" name="appointmentDate" value="' + date + '">';
+            document.body.appendChild(form); form.submit();
+        }
+
+        function reopenCase(sessionId) {
+            if (!confirm('Reopen this case? It will move back to Pending.')) return;
+            const form = document.createElement('form'); form.method = 'POST'; form.action = 'counselor/schedule';
+            form.innerHTML = '<input type="hidden" name="action" value="reopen"><input type="hidden" name="sessionId" value="' + sessionId + '">';
             document.body.appendChild(form); form.submit();
         }
 

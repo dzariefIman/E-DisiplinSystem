@@ -59,8 +59,16 @@ public class CounselorScheduleServlet extends HttpServlet {
                     Date aptDate = Date.valueOf(dateStr);
                     CounselingSession.setAppointment(sessionId, aptDate);
                 }
+            } else if ("updateDate".equals(action)) {
+                String dateStr = req.getParameter("appointmentDate");
+                if (dateStr != null && !dateStr.isEmpty()) {
+                    Date aptDate = Date.valueOf(dateStr);
+                    CounselingSession.updateDate(sessionId, aptDate);
+                }
             } else if ("markComplete".equals(action)) {
                 CounselingSession.markComplete(sessionId);
+            } else if ("reopen".equals(action)) {
+                CounselingSession.reopen(sessionId);
             }
         } catch (Exception e) {
             // ignore bad input, just redirect

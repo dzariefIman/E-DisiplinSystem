@@ -87,15 +87,7 @@ public class RecordServlet extends HttpServlet {
                         if (counselorStaffId != null && !counselorStaffId.trim().isEmpty()) {
                             cs.setStaffID(counselorStaffId);
                         }
-                        String status = req.getParameter("status");
-                        if (status != null) cs.setStatus(status);
-                        String apt = req.getParameter("appointmentDate");
-                        if (apt != null && !apt.isEmpty()) {
-                            cs.setAppointmentDate(Date.valueOf(apt));
-                            if ("Not Set".equals(cs.getStatus()) || cs.getStatus() == null) {
-                                cs.setStatus("Pending");
-                            }
-                        }
+                        cs.update();
                     }
                 }
                 resp.sendRedirect(req.getContextPath() + "/hep/records");

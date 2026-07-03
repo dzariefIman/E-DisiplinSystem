@@ -211,7 +211,7 @@ public class DisciplinaryCase {
 
     public String getIncidentDateDisplay() {
         if (incidentDate == null) return "";
-        return String.format("%td%tm%ty", incidentDate, incidentDate, incidentDate);
+        return String.format("%td-%tm-%tY", incidentDate, incidentDate, incidentDate);
     }
 
     public String getLoggedByName() {

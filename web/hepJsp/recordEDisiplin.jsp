@@ -2,6 +2,7 @@
 <%@page import="model.DisciplinaryCase, model.CounselingSession, model.User, java.util.List"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <%
   DisciplinaryCase editRecord = (DisciplinaryCase) request.getAttribute("editRecord");
   List<User> counselors = (List<User>) request.getAttribute("counselors");
@@ -19,6 +20,7 @@
     }
   }
 %>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -166,7 +168,7 @@
                         </div>
                         <div class="modal-field">
                             <label>Status</label>
-                            <select name="status">
+                            <select name="status" disabled class="field-disabled">
                                 <% for (String s : statuses) { %>
                                     <option value="<%= s %>" <%= s.equals(editStatus) ? "selected" : "" %>><%= s %></option>
                                 <% } %>
@@ -174,7 +176,7 @@
                         </div>
                         <div class="modal-field">
                             <label>Appointment Date</label>
-                            <input type="date" name="appointmentDate" value="<%= editApptDate %>">
+                            <input type="date" name="appointmentDate" value="<%= editApptDate %>" disabled class="field-disabled">
                         </div>
                     </div>
                     <div class="modal-actions">

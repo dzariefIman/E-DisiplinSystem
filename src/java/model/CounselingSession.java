@@ -199,6 +199,31 @@ public class CounselingSession {
         }
     }
 
+    public static boolean updateDate(String sessionId, Date appointmentDate) {
+        String sql = "UPDATE counseling_session SET appointment_date = ? WHERE session_id = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, appointmentDate);
+            ps.setString(2, sessionId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean reopen(String sessionId) {
+        String sql = "UPDATE counseling_session SET status = 'Pending' WHERE session_id = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sessionId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean markComplete(String sessionId) {
         String sql = "UPDATE counseling_session SET status = 'Completed' WHERE session_id = ?";
         try (Connection conn = DatabaseUtil.getConnection();
@@ -253,7 +278,7 @@ public class CounselingSession {
     }
 
     public String getAppointmentDateDisplay() {
-        return appointmentDate != null ? String.format("%td%tm%ty", appointmentDate, appointmentDate, appointmentDate) : "Not Set";
+        return appointmentDate != null ? String.format("%td-%tm-%tY", appointmentDate, appointmentDate, appointmentDate) : "Not Set";
     }
 
     public String getStatusClass() {
@@ -273,4 +298,17 @@ public class CounselingSession {
     public void setStaffID(String staffID) { this.staffID = staffID; }
     public void setAppointmentDate(Date appointmentDate) { this.appointmentDate = appointmentDate; }
     public void setStatus(String status) { this.status = status; }
+
+    public boolean update() {
+        String sql = "UPDATE counseling_session SET staffID = ? WHERE session_id = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, this.staffID);
+            ps.setString(2, this.sessionId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -642,9 +642,14 @@ select.action-button:hover {
     background-color: #f0f0f0;
 }
 
-.calendar-day.has-appointment {
+.calendar-day.has-completed {
     background-color: #e8f5e9;
     border-color: #2ecc71;
+    font-weight: bold;
+}
+.calendar-day.has-pending {
+    background-color: #fff9c4;
+    border-color: #f1c40f;
     font-weight: bold;
 }
 
@@ -964,6 +969,12 @@ select.action-button:hover {
     font-size: 12px;
     color: #999;
     font-style: italic;
+}
+.field-disabled {
+    opacity: 0.5;
+    background-color: #f0f0f0 !important;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .table-link {
