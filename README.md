@@ -42,15 +42,15 @@
 
 ## Login Credentials
 
-### HEP
-| Field | Value |
-|-------|-------|
-| ID | H001 |
-| Password | pass123 |
+| Role | Staff ID | Password |
+|------|----------|----------|
+| HEP | HEP001 | 1234 |
+| Counselor | CNS001 | 1234 |
+| Counselor | CNS002 | 1234 |
 
-### Counselor
-| Field | Value |
-|-------|-------|
-| ID | COO1 |
-| Password | pass123 |
+---
+
+## Entity Relationship Diagram
+
+![ERD](erd.png)
 

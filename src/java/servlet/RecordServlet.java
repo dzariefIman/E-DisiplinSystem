@@ -2,6 +2,7 @@ package servlet;
 
 import model.DisciplinaryCase;
 import model.CounselingSession;
+import model.Student;
 import model.User;
 import java.io.IOException;
 import java.sql.Date;
