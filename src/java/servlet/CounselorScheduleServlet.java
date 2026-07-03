@@ -1,6 +1,7 @@
 package servlet;
 
-import model.Incident;
+import model.DisciplinaryCase;
+import model.CounselingSession;
 import model.User;
 import java.io.IOException;
 import java.sql.Date;
@@ -28,10 +29,10 @@ public class CounselorScheduleServlet extends HttpServlet {
             return;
         }
 
-        int counselorId = user.getUserId();
-        List<Incident> myCases = Incident.getByCounselor(counselorId);
-        req.setAttribute("myCases", myCases);
-        req.setAttribute("myCasesJson", buildJson(myCases));
+        String staffID = user.getStaffID();
+        List<CounselingSession> mySessions = CounselingSession.getByCounselor(staffID);
+        req.setAttribute("mySessions", mySessions);
+        req.setAttribute("mySessionsJson", buildJson(mySessions));
         req.getRequestDispatcher("/counselorJsp/counselorSchedule.jsp").forward(req, resp);
     }
 
@@ -46,21 +47,20 @@ public class CounselorScheduleServlet extends HttpServlet {
 
         try {
             String action = req.getParameter("action");
-            String incidentIdStr = req.getParameter("incidentId");
-            if (incidentIdStr == null || incidentIdStr.trim().isEmpty()) {
+            String sessionId = req.getParameter("sessionId");
+            if (sessionId == null || sessionId.trim().isEmpty()) {
                 resp.sendRedirect(req.getContextPath() + "/counselor/schedule");
                 return;
             }
-            int incidentId = Integer.parseInt(incidentIdStr);
 
             if ("setAppointment".equals(action)) {
                 String dateStr = req.getParameter("appointmentDate");
                 if (dateStr != null && !dateStr.isEmpty()) {
                     Date aptDate = Date.valueOf(dateStr);
-                    Incident.setAppointment(incidentId, aptDate);
+                    CounselingSession.setAppointment(sessionId, aptDate);
                 }
             } else if ("markComplete".equals(action)) {
-                Incident.updateStatus(incidentId, "Completed");
+                CounselingSession.markComplete(sessionId);
             }
         } catch (Exception e) {
             // ignore bad input, just redirect
@@ -69,19 +69,21 @@ public class CounselorScheduleServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/counselor/schedule");
     }
 
-    private String buildJson(List<Incident> records) {
-        return records.stream().map(inc -> {
+    private String buildJson(List<CounselingSession> sessions) {
+        return sessions.stream().map(cs -> {
+            DisciplinaryCase dc = cs.getDisciplinaryCase();
             StringBuilder sb = new StringBuilder("{");
-            sb.append("incidentId:").append(inc.getIncidentId());
-            sb.append(",studentId:'").append(js(inc.getStudentId())).append("'");
-            sb.append(",studentName:'").append(js(inc.getStudentName())).append("'");
-            sb.append(",offenseType:'").append(js(inc.getOffenseType())).append("'");
-            sb.append(",incidentDate:'").append(inc.getIncidentDate()).append("'");
-            sb.append(",incidentDateDisplay:'").append(inc.getIncidentDateDisplay()).append("'");
-            sb.append(",description:'").append(js(inc.getDescription())).append("'");
-            sb.append(",status:'").append(js(inc.getStatus())).append("'");
-            sb.append(",appointmentDate:'").append(inc.getAppointmentDate() != null ? inc.getAppointmentDate() : "").append("'");
-            sb.append(",appointmentDateDisplay:'").append(inc.getAppointmentDateDisplay()).append("'");
+            sb.append("sessionId:'").append(js(cs.getSessionId())).append("'");
+            sb.append(",caseId:'").append(js(cs.getCaseId())).append("'");
+            sb.append(",studentId:'").append(js(dc != null ? dc.getStudentId() : "")).append("'");
+            sb.append(",studentName:'").append(js(dc != null ? dc.getStudentName() : "")).append("'");
+            sb.append(",offenseType:'").append(js(dc != null ? dc.getOffenseType() : "")).append("'");
+            sb.append(",incidentDate:'").append(dc != null ? dc.getIncidentDate() : "").append("'");
+            sb.append(",incidentDateDisplay:'").append(dc != null ? dc.getIncidentDateDisplay() : "").append("'");
+            sb.append(",description:'").append(js(dc != null ? dc.getDescription() : "")).append("'");
+            sb.append(",status:'").append(js(cs.getStatus())).append("'");
+            sb.append(",appointmentDate:'").append(cs.getAppointmentDate() != null ? cs.getAppointmentDate() : "").append("'");
+            sb.append(",appointmentDateDisplay:'").append(cs.getAppointmentDateDisplay()).append("'");
             sb.append("}");
             return sb.toString();
         }).collect(Collectors.joining(",\n", "[", "]"));

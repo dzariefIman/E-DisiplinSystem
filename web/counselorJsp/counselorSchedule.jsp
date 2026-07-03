@@ -97,7 +97,7 @@
         <div class="notification" id="scheduleNotification"></div>
 
         <script>
-        const myCases = ${myCasesJson};
+        const myCases = ${mySessionsJson};
         const now = new Date(); let currentYear = now.getFullYear(); let currentMonth = now.getMonth();
         let datesCases = {};
 
@@ -168,7 +168,7 @@
                 div.innerHTML = '<p><strong>Student:</strong> ' + c.studentName + '</p><p><strong>ID:</strong> ' + c.studentId + '</p><p><strong>Offense:</strong> ' + c.offenseType + '</p><p><strong>Description:</strong> ' + (c.description || '') + '</p><p><strong>Status:</strong> <span class="status-badge ' + stCls + '">' + c.status + '</span></p>';
                 if (c.status === 'Pending' || c.status === 'Not Set') {
                     if (canComplete) {
-                        div.innerHTML += '<form action="counselor/schedule" method="POST" style="margin-top:10px;"><input type="hidden" name="action" value="markComplete"><input type="hidden" name="incidentId" value="' + c.incidentId + '"><button type="submit" class="btn-complete">✓ Mark as Completed</button></form>';
+                        div.innerHTML += '<form action="counselor/schedule" method="POST" style="margin-top:10px;"><input type="hidden" name="action" value="markComplete"><input type="hidden" name="sessionId" value="' + c.sessionId + '"><button type="submit" class="btn-complete">✓ Mark as Completed</button></form>';
                     } else {
                         div.innerHTML += '<p class="complete-disabled">Appointment date hasn\'t arrived yet.</p>';
                     }
@@ -222,19 +222,19 @@
                     li.style.cssText = 'border-bottom:1px solid #f0f0f0;padding:10px 0';
                     li.innerHTML = '<strong>' + c.studentName + '</strong><br><span class="student-item-id">' + c.studentId + ' — ' + c.offenseType + '</span>';
                     const row = document.createElement('div'); row.className = 'date-row';
-                    row.innerHTML = '<input type="date" id="dateInput-' + c.incidentId + '" class="date-picker" min="' + new Date().toISOString().split('T')[0] + '"><button onclick="setAppointmentDate(' + c.incidentId + ')" class="set-date-btn">Set Date</button>';
+                    row.innerHTML = '<input type="date" id="dateInput-' + c.sessionId + '" class="date-picker" min="' + new Date().toISOString().split('T')[0] + '"><button onclick="setAppointmentDate(\'' + c.sessionId + '\')" class="set-date-btn">Set Date</button>';
                     li.appendChild(row);
                     notSetList.appendChild(li);
                 });
             }
         }
 
-        function setAppointmentDate(incidentId) {
-            const input = document.getElementById('dateInput-' + incidentId);
+        function setAppointmentDate(sessionId) {
+            const input = document.getElementById('dateInput-' + sessionId);
             const date = input.value;
             if (!date) { alert("Please select a date first."); return; }
             const form = document.createElement('form'); form.method = 'POST'; form.action = 'counselor/schedule';
-            form.innerHTML = '<input type="hidden" name="action" value="setAppointment"><input type="hidden" name="incidentId" value="' + incidentId + '"><input type="hidden" name="appointmentDate" value="' + date + '">';
+            form.innerHTML = '<input type="hidden" name="action" value="setAppointment"><input type="hidden" name="sessionId" value="' + sessionId + '"><input type="hidden" name="appointmentDate" value="' + date + '">';
             document.body.appendChild(form); form.submit();
         }
 

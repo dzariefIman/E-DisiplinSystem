@@ -1,6 +1,6 @@
 package servlet;
 
-import model.Incident;
+import model.DisciplinaryCase;
 import model.User;
 import java.io.IOException;
 import java.util.List;
@@ -26,12 +26,12 @@ public class CounselorRecordServlet extends HttpServlet {
             return;
         }
 
-        int counselorId = user.getUserId();
+        String staffID = user.getStaffID();
         String search = req.getParameter("search");
         String offense = req.getParameter("offense");
         String status = req.getParameter("status");
 
-        List<Incident> records = Incident.search(search, offense, status, counselorId);
+        List<DisciplinaryCase> records = DisciplinaryCase.search(search, offense, status, staffID);
         req.setAttribute("records", records);
         req.getRequestDispatcher("/counselorJsp/counselorRecord.jsp").forward(req, resp);
     }

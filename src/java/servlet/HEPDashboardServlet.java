@@ -1,6 +1,7 @@
 package servlet;
 
-import model.Incident;
+import model.DisciplinaryCase;
+import model.CounselingSession;
 import model.User;
 import java.io.IOException;
 import java.util.*;
@@ -27,14 +28,14 @@ public class HEPDashboardServlet extends HttpServlet {
             return;
         }
 
-        int totalCases = Incident.getTotalCases();
-        String commonOffense = Incident.getMostCommonOffense();
-        int pendingCount = Incident.getPendingCount();
-        List<Incident> records = Incident.getAll();
+        int totalCases = DisciplinaryCase.getTotalCases();
+        String commonOffense = DisciplinaryCase.getMostCommonOffense();
+        int pendingCount = CounselingSession.getGlobalPendingCount();
+        List<DisciplinaryCase> records = DisciplinaryCase.getAll();
 
         Map<String, Integer> offenseCount = new LinkedHashMap<>();
-        for (Incident inc : records) {
-            String type = inc.getOffenseType();
+        for (DisciplinaryCase c : records) {
+            String type = c.getOffenseType();
             offenseCount.put(type, offenseCount.getOrDefault(type, 0) + 1);
         }
 
@@ -46,12 +47,12 @@ public class HEPDashboardServlet extends HttpServlet {
         for (int m = 1; m <= currentMonth; m++) {
             monthLabels.add(monthNames[m - 1]);
             int total = 0, completed = 0;
-            for (Incident inc : records) {
-                if (inc.getIncidentDate() != null) {
-                    int incMonth = inc.getIncidentDate().toLocalDate().getMonthValue();
+            for (DisciplinaryCase c : records) {
+                if (c.getIncidentDate() != null) {
+                    int incMonth = c.getIncidentDate().toLocalDate().getMonthValue();
                     if (incMonth == m) {
                         total++;
-                        if ("Completed".equals(inc.getStatus())) completed++;
+                        if ("Completed".equals(c.getStatus())) completed++;
                     }
                 }
             }

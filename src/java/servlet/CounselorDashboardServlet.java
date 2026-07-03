@@ -1,9 +1,11 @@
 package servlet;
 
-import model.Incident;
+import model.DisciplinaryCase;
+import model.CounselingSession;
 import model.User;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,15 +28,18 @@ public class CounselorDashboardServlet extends HttpServlet {
             return;
         }
 
-        int counselorId = user.getUserId();
-        int totalCases = Incident.getTotalByCounselor(counselorId);
-        int completedCases = Incident.getCompletedByCounselor(counselorId);
-        int pendingCases = Incident.getPendingByCounselor(counselorId);
-        int notSetCases = Incident.getNotSetByCounselor(counselorId);
+        String staffID = user.getStaffID();
+        int totalCases = CounselingSession.getTotalCount(staffID);
+        int completedCases = CounselingSession.getCompletedCount(staffID);
+        int pendingCases = CounselingSession.getPendingCount(staffID);
+        int notSetCases = CounselingSession.getNotSetCount(staffID);
         int pendingReferrals = pendingCases + notSetCases;
         int completionRate = totalCases > 0 ? Math.round((float) completedCases / totalCases * 100) : 0;
 
-        List<Incident> latestCases = Incident.getLatestByCounselor(counselorId, 5);
+        List<CounselingSession> latestSessions = CounselingSession.getLatestByCounselor(staffID, 5);
+        List<DisciplinaryCase> latestCases = latestSessions.stream()
+            .map(CounselingSession::getDisciplinaryCase)
+            .collect(Collectors.toList());
 
         req.setAttribute("totalCases", totalCases);
         req.setAttribute("completedCases", completedCases);

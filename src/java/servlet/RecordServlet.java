@@ -1,6 +1,7 @@
 package servlet;
 
-import model.Incident;
+import model.DisciplinaryCase;
+import model.CounselingSession;
 import model.User;
 import java.io.IOException;
 import java.sql.Date;
@@ -27,14 +28,12 @@ public class RecordServlet extends HttpServlet {
         String status = req.getParameter("status");
         String editId = req.getParameter("editId");
 
-        List<Incident> records = Incident.search(search, offense, status, null);
+        List<DisciplinaryCase> records = DisciplinaryCase.search(search, offense, status, null);
         List<User> counselors = User.getAllCounselors();
 
         if (editId != null && !editId.isEmpty()) {
-            try {
-                Incident editRecord = Incident.getById(Integer.parseInt(editId));
-                req.setAttribute("editRecord", editRecord);
-            } catch (Exception e) { /* bad id, ignore */ }
+            DisciplinaryCase editRecord = DisciplinaryCase.getById(editId);
+            if (editRecord != null) req.setAttribute("editRecord", editRecord);
         }
 
         req.setAttribute("records", records);
@@ -53,37 +52,50 @@ public class RecordServlet extends HttpServlet {
 
         try {
             String action = req.getParameter("action");
-            String incidentIdStr = req.getParameter("incidentId");
-            if (incidentIdStr == null || incidentIdStr.trim().isEmpty()) {
+            String caseId = req.getParameter("caseId");
+            if (caseId == null || caseId.trim().isEmpty()) {
                 resp.sendRedirect(req.getContextPath() + "/hep/records");
                 return;
             }
-            int incidentId = Integer.parseInt(incidentIdStr);
 
             if ("delete".equals(action)) {
-                Incident.delete(incidentId);
+                DisciplinaryCase.delete(caseId);
                 resp.sendRedirect(req.getContextPath() + "/hep/records");
             } else if ("update".equals(action)) {
-                Incident inc = Incident.getById(incidentId);
-                if (inc != null) {
-                    inc.setStudentId(req.getParameter("studentId"));
-                    inc.setStudentName(req.getParameter("studentName"));
-                    inc.setOffenseType(req.getParameter("offenseType"));
+                DisciplinaryCase dc = DisciplinaryCase.getById(caseId);
+                if (dc != null) {
+                    String newStudentId = req.getParameter("studentId");
+                    String newStudentName = req.getParameter("studentName");
+                    if (newStudentId != null && !newStudentId.trim().isEmpty()) {
+                        dc.setStudentId(newStudentId.trim());
+                        if (newStudentName != null && !newStudentName.trim().isEmpty()) {
+                            Student.findOrCreate(newStudentId.trim(), newStudentName.trim());
+                        }
+                    }
+                    dc.setOffenseType(req.getParameter("offenseType"));
                     String dateStr = req.getParameter("incidentDate");
                     if (dateStr != null && !dateStr.isEmpty()) {
-                        inc.setIncidentDate(Date.valueOf(dateStr));
+                        dc.setIncidentDate(Date.valueOf(dateStr));
                     }
-                    inc.setDescription(req.getParameter("description"));
-                    String assignedStr = req.getParameter("assignedTo");
-                    if (assignedStr != null && !assignedStr.isEmpty()) {
-                        inc.setAssignedTo(Integer.parseInt(assignedStr));
+                    dc.setDescription(req.getParameter("description"));
+                    dc.update();
+
+                    CounselingSession cs = CounselingSession.getByCaseId(caseId);
+                    if (cs != null) {
+                        String counselorStaffId = req.getParameter("assignedTo");
+                        if (counselorStaffId != null && !counselorStaffId.trim().isEmpty()) {
+                            cs.setStaffID(counselorStaffId);
+                        }
+                        String status = req.getParameter("status");
+                        if (status != null) cs.setStatus(status);
+                        String apt = req.getParameter("appointmentDate");
+                        if (apt != null && !apt.isEmpty()) {
+                            cs.setAppointmentDate(Date.valueOf(apt));
+                            if ("Not Set".equals(cs.getStatus()) || cs.getStatus() == null) {
+                                cs.setStatus("Pending");
+                            }
+                        }
                     }
-                    inc.setStatus(req.getParameter("status"));
-                    String apt = req.getParameter("appointmentDate");
-                    if (apt != null && !apt.isEmpty()) {
-                        inc.setAppointmentDate(Date.valueOf(apt));
-                    }
-                    inc.update();
                 }
                 resp.sendRedirect(req.getContextPath() + "/hep/records");
             } else {

@@ -76,7 +76,7 @@
                             <select name="assignedTo" required>
                                 <option value="">-- Select counselor --</option>
                                 <c:forEach var="c" items="${counselors}">
-                                    <option value="${c.userId}">${c.fullName}</option>
+                                    <option value="${c.staffID}">${c.fullName}</option>
                                 </c:forEach>
                             </select>
                         </div>

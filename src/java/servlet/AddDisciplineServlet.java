@@ -1,6 +1,8 @@
 package servlet;
 
-import model.Incident;
+import model.Student;
+import model.DisciplinaryCase;
+import model.CounselingSession;
 import model.User;
 import java.io.IOException;
 import java.sql.Date;
@@ -48,28 +50,36 @@ public class AddDisciplineServlet extends HttpServlet {
             String offenseType = req.getParameter("offenseType");
             String incidentDateStr = req.getParameter("incidentDate");
             String description = req.getParameter("description");
-            String assignedToStr = req.getParameter("assignedTo");
+            String counselorStaffId = req.getParameter("assignedTo");
 
             if (studentId == null || studentId.trim().isEmpty() ||
                 studentName == null || studentName.trim().isEmpty() ||
                 offenseType == null || offenseType.trim().isEmpty() ||
                 incidentDateStr == null || incidentDateStr.trim().isEmpty() ||
-                assignedToStr == null || assignedToStr.trim().isEmpty()) {
+                counselorStaffId == null || counselorStaffId.trim().isEmpty()) {
                 resp.sendRedirect(req.getContextPath() + "/hep/add-discipline?error=1");
                 return;
             }
 
-            Incident inc = new Incident();
-            inc.setStudentId(studentId.trim());
-            inc.setStudentName(studentName.trim());
-            inc.setOffenseType(offenseType);
-            inc.setIncidentDate(Date.valueOf(incidentDateStr));
-            inc.setDescription(description);
-            inc.setAssignedTo(Integer.parseInt(assignedToStr));
-            inc.setLoggedBy(loggedInUser.getUserId());
-            inc.setStatus("Not Set");
+            Student.findOrCreate(studentId.trim(), studentName.trim());
 
-            if (inc.add()) {
+            String caseId = DisciplinaryCase.getNextCaseId();
+            DisciplinaryCase dc = new DisciplinaryCase();
+            dc.setCaseId(caseId);
+            dc.setStudentId(studentId.trim());
+            dc.setOffenseType(offenseType);
+            dc.setDescription(description);
+            dc.setIncidentDate(Date.valueOf(incidentDateStr));
+            dc.setStaffID(loggedInUser.getStaffID());
+
+            if (dc.add()) {
+                String sessionId = CounselingSession.getNextSessionId();
+                CounselingSession cs = new CounselingSession();
+                cs.setSessionId(sessionId);
+                cs.setCaseId(caseId);
+                cs.setStaffID(counselorStaffId);
+                cs.setStatus("Not Set");
+                cs.add();
                 resp.sendRedirect(req.getContextPath() + "/hep/add-discipline?success=1");
             } else {
                 resp.sendRedirect(req.getContextPath() + "/hep/add-discipline?error=1");
