@@ -261,7 +261,7 @@
         }
 
         function updateAppointmentDate(sessionId) {
-            var input = document.getElementById('dateInput-' + sessionId) || document.getElementById('modalDateInput-' + sessionId);
+            var input = document.getElementById('modalDateInput-' + sessionId) || document.getElementById('dateInput-' + sessionId);
             var date = input.value;
             if (!date) { alert("Please select a date first."); return; }
             var form = document.createElement('form'); form.method = 'POST'; form.action = 'counselor/schedule';
