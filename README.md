@@ -52,5 +52,5 @@
 
 ## Entity Relationship Diagram
 
-![ERD](erd.png)
+![ERD](ERD_E-DISIPLIN.jpg)
 
