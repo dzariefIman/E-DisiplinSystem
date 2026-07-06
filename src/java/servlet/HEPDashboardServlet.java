@@ -31,6 +31,8 @@ public class HEPDashboardServlet extends HttpServlet {
         int totalCases = DisciplinaryCase.getTotalCases();
         String commonOffense = DisciplinaryCase.getMostCommonOffense();
         int pendingCount = CounselingSession.getGlobalPendingCount();
+        int notSetCount = CounselingSession.getGlobalNotSetCount();
+        int pendingNotSetCount = pendingCount + notSetCount;
         List<DisciplinaryCase> records = DisciplinaryCase.getAll();
 
         Map<String, Integer> offenseCount = new LinkedHashMap<>();
@@ -61,7 +63,7 @@ public class HEPDashboardServlet extends HttpServlet {
 
         req.setAttribute("totalCases", totalCases);
         req.setAttribute("commonOffense", commonOffense);
-        req.setAttribute("pendingCount", pendingCount);
+        req.setAttribute("pendingNotSetCount", pendingNotSetCount);
         req.setAttribute("records", records);
         req.setAttribute("offenseLabels", String.join(",", offenseCount.keySet()));
         req.setAttribute("offenseData", String.join(",", offenseCount.values().stream().map(String::valueOf).toArray(String[]::new)));

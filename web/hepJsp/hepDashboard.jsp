@@ -40,13 +40,10 @@
                         <p>${commonOffense}</p>
                     </div>
                     <div class="stat-card">
-                        <h4>View pending counseling sessions</h4>
-                        <p>${pendingCount} cases</p>
+                        <h4>Pending & Not Set Sessions</h4>
+                        <p>${pendingNotSetCount} cases</p>
                     </div>
-                    <div class="stat-card">
-                        <h4>View charts and reports</h4>
-                        <p>System tracking active records</p>
-                    </div>
+                    
                 </div>
 
                 <div class="charts-container">
